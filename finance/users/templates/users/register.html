@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Criar conta | FinanSee{% endblock %}
+
+{% block content %}
+<section class="register-page" aria-labelledby="register-title">
+    <div class="register-heading">
+        <p class="eyebrow">Comece por aqui</p>
+        <h1 id="register-title">Crie sua conta</h1>
+        <p>Seus dados financeiros, organizados desde o primeiro acesso.</p>
+    </div>
+    <form class="register-form" method="post">
+        {% csrf_token %}
+        <label for="full-name">Nome completo</label>
+        <input id="full-name" name="full_name" type="text" autocomplete="name" required>
+
+        <label for="email">E-mail</label>
+        <input id="email" name="email" type="email" autocomplete="email" required>
+
+        <label for="password">Senha</label>
+        <input id="password" name="password" type="password" autocomplete="new-password" required>
+
+        <button class="button-link" type="submit">Criar conta</button>
+    </form>
+</section>
+{% endblock %}

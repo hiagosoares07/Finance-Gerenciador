@@ -1,0 +1,1 @@
+"""Custom user-related models can be defined here when needed."""
