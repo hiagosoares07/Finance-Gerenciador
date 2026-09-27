@@ -5,13 +5,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Gerencie suas finanças em um só lugar.">
-    <title>{% block title %}FinanSee{% endblock %}</title>
+    <title>{% block title %}FinanceR{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
-    {% block extra_css %}{% endblock %}
+    {% block extra_css %}{% endblock %} 
 </head>
 <body>
     <header class="site-header">
-        <a class="brand" href="{% url 'home' %}">FinanSee<span>.</span></a>
+        <a class="brand" href="{% url 'home' %}">FinanceR<span>.</span></a>
         <nav aria-label="Navegação principal">
             <a href="{% url 'home' %}">Início</a>
             <a class="nav-action" href="{% url 'users:register' %}">Criar conta</a>
