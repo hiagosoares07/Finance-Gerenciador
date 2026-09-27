@@ -23,4 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
     path('cadastro/', include('users.urls')),
+    path('sair/', views.logout_view, name='logout'),
+    path('movimentacoes/adicionar/', views.add_transaction, name='add_transaction'),
+    path('movimentacoes/<int:transaction_id>/excluir/', views.delete_transaction, name='delete_transaction'),
 ]

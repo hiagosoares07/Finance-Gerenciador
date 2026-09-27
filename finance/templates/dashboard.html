@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Painel | FinanceR{% endblock %}
+
+{% block content %}
+<div class="dashboard-shell">
+    <aside class="dashboard-sidebar" aria-label="Navegação do painel">
+        <a class="sidebar-create" href="#add-transaction" data-open-transaction>+ Nova movimentação</a>
+        <nav class="dashboard-nav">
+            <a class="dashboard-nav-link is-active" href="#overview"><span aria-hidden="true">⌂</span> Visão geral</a>
+            <a class="dashboard-nav-link" href="#transactions"><span aria-hidden="true">⇄</span> Movimentações</a>
+            <a class="dashboard-nav-link" href="#monthly"><span aria-hidden="true">▦</span> Calendário</a>
+            <a class="dashboard-nav-link" href="#insights"><span aria-hidden="true">◷</span> Análises</a>
+        </nav>
+        <div class="sidebar-bottom">
+            <span class="user-avatar" aria-hidden="true">{{ user.first_name|default:user.email|slice:":1"|upper }}</span>
+            <span class="user-details"><strong>{{ user.first_name|default:user.email }}</strong><small>Conta pessoal</small></span>
+            <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="sidebar-logout" type="submit" aria-label="Sair da conta" title="Sair da conta">↗</button></form>
+        </div>
+    </aside>
+
+    <main class="dashboard-main" id="overview">
+        <header class="dashboard-heading">
+            <div>
+                <p class="eyebrow">Seu espaço financeiro</p>
+                <h1>Olá, {{ user.first_name|default:user.email }}.</h1>
+                <p class="dashboard-date">Aqui está o resumo da sua vida financeira.</p>
+            </div>
+            <button class="icon-button mobile-menu-toggle" type="button" aria-label="Abrir navegação" aria-expanded="false" data-menu-toggle>☰</button>
+            <button class="button-link heading-action" type="button" data-open-transaction>+ Adicionar</button>
+        </header>
+
+        {% if messages %}
+            <ul class="dashboard-messages" aria-live="polite">
+                {% for message in messages %}<li class="{{ message.tags }}">{{ message }}</li>{% endfor %}
+            </ul>
+        {% endif %}
+
+        <section class="balance-strip" aria-label="Saldo total">
+            <div>
+                <p>Saldo total</p>
+                <strong>R$ {{ balance|floatformat:2 }}</strong>
+            </div>
+            <span class="balance-mark" aria-hidden="true">R$</span>
+        </section>
+
+        <section class="summary-section" aria-labelledby="summary-title">
+            <div class="section-heading">
+                <div><h2 id="summary-title">Resumo do mês</h2><p>{{ month_label|capfirst }}</p></div>
+                <span class="period-label">Mês atual</span>
+            </div>
+            <div class="summary-grid">
+                <article class="summary-card income-card">
+                    <div class="metric-label"><span class="metric-icon" aria-hidden="true">↙</span><span>Entradas</span></div>
+                    <strong>R$ {{ income_total|floatformat:2 }}</strong>
+                    <span class="metric-note">Recebido neste mês</span>
+                    <span class="metric-bar"><i style="width: {{ income_width }}%"></i></span>
+                </article>
+                <article class="summary-card expense-card">
+                    <div class="metric-label"><span class="metric-icon" aria-hidden="true">↗</span><span>Saídas</span></div>
+                    <strong>R$ {{ expense_total|floatformat:2 }}</strong>
+                    <span class="metric-note">Gasto neste mês</span>
+                    <span class="metric-bar"><i style="width: {{ expense_width }}%"></i></span>
+                </article>
+                <article class="summary-card result-card">
+                    <div class="metric-label"><span class="metric-icon" aria-hidden="true">＝</span><span>Resultado</span></div>
+                    <strong>R$ {{ net_total|floatformat:2 }}</strong>
+                    <span class="metric-note">Entradas menos saídas</span>
+                    <span class="result-status">{% if net_total >= 0 %}Saldo positivo{% else %}Saldo negativo{% endif %}</span>
+                </article>
+            </div>
+        </section>
+
+        <div class="dashboard-lower-grid">
+            <section class="panel transaction-panel" id="transactions" aria-labelledby="transactions-title">
+                <div class="section-heading">
+                    <div><h2 id="transactions-title">Movimentações recentes</h2><p>Seu histórico mais recente</p></div>
+                    <button class="text-button" type="button" data-open-transaction>Adicionar <span aria-hidden="true">＋</span></button>
+                </div>
+                {% if transactions %}
+                    <ul class="transaction-list">
+                        {% for transaction in transactions %}
+                            <li class="transaction-row">
+                                <span class="transaction-symbol {% if transaction.kind == 'income' %}symbol-income{% else %}symbol-expense{% endif %}" aria-hidden="true">{% if transaction.kind == 'income' %}↙{% else %}↗{% endif %}</span>
+                                <span class="transaction-description"><strong>{{ transaction.description }}</strong><small>{{ transaction.category }} · {{ transaction.occurred_at|date:"d/m/Y" }}</small></span>
+                                <strong class="transaction-amount {% if transaction.kind == 'income' %}amount-income{% else %}amount-expense{% endif %}">{% if transaction.kind == 'income' %}+{% else %}−{% endif %} R$ {{ transaction.amount|floatformat:2 }}</strong>
+                                <form method="post" action="{% url 'delete_transaction' transaction.id %}" class="delete-transaction-form">
+                                    {% csrf_token %}
+                                    <button type="submit" class="icon-button delete-button" aria-label="Excluir {{ transaction.description }}" title="Excluir">×</button>
+                                </form>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="empty-state">
+                        <span class="empty-mark" aria-hidden="true">＋</span>
+                        <strong>Seu histórico começa aqui</strong>
+                        <p>Adicione uma entrada ou saída para acompanhar seu saldo.</p>
+                        <button class="text-button" type="button" data-open-transaction>Adicionar movimentação</button>
+                    </div>
+                {% endif %}
+            </section>
+
+            <section class="panel calendar-panel" id="monthly" aria-labelledby="calendar-title">
+                <div class="section-heading">
+                    <div><h2 id="calendar-title">Calendário</h2><p>{{ month_label|capfirst }}</p></div>
+                    <span class="calendar-today">Hoje, {{ today|date:"d/m" }}</span>
+                </div>
+                <div class="calendar-grid" role="grid" aria-label="Calendário de {{ month_label }}">
+                    {% for weekday in weekdays %}<span class="calendar-weekday">{{ weekday }}</span>{% endfor %}
+                    {% for week in calendar_weeks %}
+                        {% for day in week %}
+                            {% if day %}
+                                <span class="calendar-day{% if day == today.day %} is-today{% endif %}{% if day in daily_totals %} has-activity{% endif %}" role="gridcell"{% if day == today.day %} aria-current="date"{% endif %}>{{ day }}{% if day in daily_totals %}<i aria-hidden="true"></i>{% endif %}</span>
+                            {% else %}<span class="calendar-day is-empty" aria-hidden="true"></span>{% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+                <div class="calendar-legend"><span><i></i> Dia atual</span><span><i></i> Com movimentação</span></div>
+            </section>
+        </div>
+
+        <section class="insight-strip" id="insights" aria-labelledby="insight-title">
+            <span class="insight-icon" aria-hidden="true">✳</span>
+            <div><h2 id="insight-title">Um passo de cada vez</h2><p>{% if has_transactions %}Cada movimentação registrada ajuda você a entender melhor seus hábitos financeiros.{% else %}Registre suas movimentações para descobrir como seu dinheiro circula ao longo do mês.{% endif %}</p></div>
+            <a href="#transactions" class="insight-link">Ver histórico <span aria-hidden="true">→</span></a>
+        </section>
+    </main>
+</div>
+
+<dialog class="transaction-dialog" id="transaction-dialog" aria-labelledby="transaction-dialog-title">
+    <form method="post" action="{% url 'add_transaction' %}" class="transaction-form">
+        {% csrf_token %}
+        <div class="dialog-heading"><div><p class="eyebrow">Seu dinheiro, em dia</p><h2 id="transaction-dialog-title">Nova movimentação</h2></div><button type="button" class="icon-button dialog-close" data-close-dialog aria-label="Fechar">×</button></div>
+        <fieldset class="kind-toggle">
+            <legend>Tipo</legend>
+            <label><input type="radio" name="kind" value="expense" checked><span>Saída</span></label>
+            <label><input type="radio" name="kind" value="income"><span>Entrada</span></label>
+        </fieldset>
+        <label for="transaction-description">Descrição</label>
+        <input id="transaction-description" name="description" type="text" maxlength="120" placeholder="Ex.: Mercado" required>
+        <div class="form-two-columns">
+            <div><label for="transaction-amount">Valor (R$)</label><input id="transaction-amount" name="amount" type="number" min="0.01" step="0.01" placeholder="0,00" required></div>
+            <div><label for="transaction-category">Categoria</label><input id="transaction-category" name="category" type="text" maxlength="40" placeholder="Geral"></div>
+        </div>
+        <label for="transaction-date">Data</label>
+        <input id="transaction-date" name="occurred_at" type="date" value="{{ today|date:'Y-m-d' }}" required>
+        <div class="dialog-actions"><button type="button" class="cancel-button" data-close-dialog>Cancelar</button><button type="submit" class="button-link">Salvar movimentação</button></div>
+    </form>
+</dialog>
+{% endblock %}
+
+{% block extra_js %}<script src="{% static 'js/dashboard.js' %}?v=1" defer></script>{% endblock %}

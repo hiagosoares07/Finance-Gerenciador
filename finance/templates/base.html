@@ -6,21 +6,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Gerencie suas finanças em um só lugar.">
     <title>{% block title %}FinanceR{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}?v=12">
     {% block extra_css %}{% endblock %} 
 </head>
 <body>
     <header class="site-header">
-        <a class="brand" href="{% url 'home' %}">FinanceR<span>.</span></a>
+        <a class="brand" href="{% url 'home' %}">
+            <img class="brand-icon" src="{% static 'images/favicon1.svg' %}" alt="">
+            FinanceR<span>.</span>
+        </a>
         <nav aria-label="Navegação principal">
-            <a href="{% url 'home' %}">Início</a>
-            <a class="nav-action" href="{% url 'users:register' %}">Criar conta</a>
+            <button class="theme-toggle" type="button" aria-label="Ativar tema escuro" aria-pressed="false" title="Alternar tema">
+                <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <circle cx="12" cy="12" r="4"></circle>
+                    <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+                </svg>
+                <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M20.2 15.4A8.5 8.5 0 0 1 8.6 3.8 8.5 8.5 0 1 0 20.2 15.4Z"></path>
+                </svg>
+            </button>
+            {% if user.is_authenticated %}
+                <a href="{% url 'home' %}">Painel</a>
+                <form method="post" action="{% url 'logout' %}" class="logout-form">{% csrf_token %}<button class="nav-action" type="submit">Sair</button></form>
+            {% else %}
+                <a href="{% url 'users:login' %}">Entrar</a>
+                <a class="nav-action" href="{% url 'users:register' %}">Criar conta</a>
+            {% endif %}
         </nav>
     </header>
     <main>
         {% block content %}{% endblock %}
     </main>
-    <script src="{% static 'js/main.js' %}" defer></script>
+    <script src="{% static 'js/main.js' %}?v=2" defer></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

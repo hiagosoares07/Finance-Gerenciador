@@ -9,10 +9,15 @@
         <h1 id="register-title">Crie sua conta</h1>
         <p>Seus dados financeiros, organizados desde o primeiro acesso.</p>
     </div>
+    {% if messages %}
+        <ul class="form-messages" aria-live="polite">
+            {% for message in messages %}<li>{{ message }}</li>{% endfor %}
+        </ul>
+    {% endif %}
     <form class="register-form" method="post">
         {% csrf_token %}
         <label for="full-name">Nome completo</label>
-        <input id="full-name" name="full_name" type="text" autocomplete="name" required>
+        <input id="full-name" name="full_name" type="text" autocomplete="name" value="{{ request.POST.full_name }}" required>
 
         <label for="email">E-mail</label>
         <input id="email" name="email" type="email" autocomplete="email" required>
@@ -21,6 +26,7 @@
         <input id="password" name="password" type="password" autocomplete="new-password" required>
 
         <button class="button-link" type="submit">Criar conta</button>
+        <p class="form-alternate">Já tem uma conta? <a href="{% url 'users:login' %}">Entrar</a></p>
     </form>
 </section>
 {% endblock %}
