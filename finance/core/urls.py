@@ -22,6 +22,7 @@ from core import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
+    path('financeiro/', include('users.financial_urls')),
     path('cadastro/', include('users.urls')),
     path('sair/', views.logout_view, name='logout'),
     path('movimentacoes/adicionar/', views.add_transaction, name='add_transaction'),
