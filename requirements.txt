@@ -1,3 +1,11 @@
 asgiref==3.12.1
 Django==6.1.1
+gunicorn==23.0.0
+packaging==26.3
+psycopg==3.3.6
+psycopg-binary==3.3.6
+python-decouple==3.8
+python-dotenv==1.2.4
 sqlparse==0.6.0
+typing_extensions==4.16.0
+whitenoise==6.12.0

@@ -53,3 +53,6 @@ venv.bak/
 .directory
 .Trash-*
 .nfs*
+
+# Cópias locais do banco (aula 4)
+backups/
